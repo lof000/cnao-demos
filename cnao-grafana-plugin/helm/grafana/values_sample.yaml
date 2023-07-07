@@ -1,0 +1,14 @@
+
+
+image: "<image>:<tag>"
+
+grafana:
+  datasource:
+      name: "xx"  
+      clientId: "xx"
+      secretKey: "xx"
+      tenantId: "xx"      
+      url: "xx"                        
+
+
+

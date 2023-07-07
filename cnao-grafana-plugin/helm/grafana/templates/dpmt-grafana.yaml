@@ -1,0 +1,101 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: appd-grafana
+  namespace: grafana
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: appd-grafana
+  template:
+    metadata:
+      name: appd-grafana
+      labels:
+        app: appd-grafana
+    spec:
+      containers:
+      - name: grafana-plugin-container
+        image: {{ .Values.image }}
+        env:
+        - name: GRAFANA_DATASOURCE_NAME
+          value: {{ .Values.grafana.datasource.name }}  
+        - name: GRAFANA_DATASOURCE_CLIENT_ID
+          value: {{ .Values.grafana.datasource.clientId }}  
+        - name: GRAFANA_DATASOURCE_SECRET_KEY
+          value: {{ .Values.grafana.datasource.secretKey }}  
+        - name: GRAFANA_DATASOURCE_TENANT_ID
+          value:  {{ .Values.grafana.datasource.tenantId }}       
+        - name: GRAFANA_DATASOURCE_URL
+          value: {{ .Values.grafana.datasource.url }}                                           
+        ports:
+        - name: grafana
+          containerPort: 3000
+        volumeMounts:
+        - mountPath: /etc/grafana/provisioning/datasources
+          name: cm-cnao-plugin
+          readOnly: false
+        - mountPath: /etc/tmpdash
+          name: cm-k8s-dash
+          readOnly: false      
+        - mountPath: /etc/grafana/provisioning/dashboards
+          name: cm-dash-config 
+          readOnly: false    
+        - mountPath: /var/lib/grafana
+          name: grafana-pv      
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /robots.txt
+            port: 3000
+            scheme: HTTP
+          initialDelaySeconds: 10
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 2
+        livenessProbe:
+          failureThreshold: 3
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          successThreshold: 1
+          tcpSocket:
+            port: 3000
+          timeoutSeconds: 1
+        resources:
+          requests:
+            cpu: 250m
+            memory: 750Mi                         
+      volumes:
+      - name: cm-cnao-plugin
+        configMap:
+          defaultMode: 420
+          name: cm-cnao-plugin
+      - name: cm-k8s-dash
+        configMap:
+          defaultMode: 420
+          name: cm-k8s-dash     
+      - name: cm-dash-config
+        configMap:
+          defaultMode: 420
+          name: cm-dash-config        
+      - name: grafana-pv
+        persistentVolumeClaim:
+          claimName: grafana-pvc  
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: appd-grafana-service
+  namespace: grafana
+spec:
+  selector:
+    app: appd-grafana
+  type: LoadBalancer
+#NodePort 
+  ports:
+  - port: 3000
+    targetPort: 3000
+    nodePort: 32001
+
+

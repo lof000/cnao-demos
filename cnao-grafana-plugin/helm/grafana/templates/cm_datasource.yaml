@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cm-cnao-plugin
+  namespace: grafana
+data:
+  grafana.yaml: |-
+   {
+    "apiVersion": 1,
+    "datasources": [
+     {
+      "editable": true,
+      "name": "$GRAFANA_DATASOURCE_NAME",
+      "type": "appdynamicscloud",
+      "orgId": 1,
+      "isDefault":true,
+      "jsonData":{
+        "authtype":"Basic",
+        "clientId":"$GRAFANA_DATASOURCE_CLIENT_ID",
+        "secretKey":"$GRAFANA_DATASOURCE_SECRET_KEY",
+        "appdtid":"$GRAFANA_DATASOURCE_TENANT_ID",
+        "url":"$GRAFANA_DATASOURCE_URL"
+       },
+      "version": 1,
+      }]
+    }
+
+

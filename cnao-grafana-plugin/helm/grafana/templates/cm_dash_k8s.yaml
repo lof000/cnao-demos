@@ -1,0 +1,1405 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cm-k8s-dash
+  namespace: grafana
+data:
+  k8dash.json: |-
+    {
+      "annotations": {
+        "list": [
+          {
+            "builtIn": 1,
+            "datasource": {
+              "type": "grafana",
+              "uid": "-- Grafana --"
+            },
+            "enable": true,
+            "hide": true,
+            "iconColor": "rgba(0, 211, 255, 1)",
+            "name": "Annotations & Alerts",
+            "target": {
+              "limit": 100,
+              "matchAny": false,
+              "tags": [],
+              "type": "dashboard"
+            },
+            "type": "dashboard"
+          }
+        ]
+      },
+      "editable": true,
+      "fiscalYearStartMonth": 0,
+      "graphTooltip": 0,
+      "id": 1,
+      "links": [],
+      "liveNow": false,
+      "panels": [
+        {
+          "collapsed": false,
+          "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 0
+          },
+          "id": 4,
+          "panels": [],
+          "title": "Cluster Summary",
+          "type": "row"
+        },
+        {
+          "datasource": {
+            "type": "appdynamicscloud",
+            "uid": "demo4"
+          },
+          "description": "Mean CPU usage for the selected pods over the selected time period.",
+          "fieldConfig": {
+            "defaults": {
+              "displayName": "CPU Usage (Mean)",
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "orange",
+                    "value": 70
+                  },
+                  {
+                    "color": "red",
+                    "value": 85
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 6,
+            "w": 4,
+            "x": 0,
+            "y": 1
+          },
+          "id": 22,
+          "options": {
+            "orientation": "auto",
+            "reduceOptions": {
+              "calcs": [
+                "mean"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showThresholdLabels": false,
+            "showThresholdMarkers": true
+          },
+          "pluginVersion": "9.1.3",
+          "targets": [
+            {
+              "constant": 6.5,
+              "datasource": {
+                "type": "appdynamicscloud",
+                "uid": "demo4"
+              },
+              "queryText": "FETCH    `CPU Utilization : ` : metrics(`k8s:cpu.usage`, `sys:derived`){timestamp, value} * metrics(`k8s:cpu.usage`, `sys:derived`){timestamp, group_count} / metrics(`k8s:cpu.usage`, `sys:derived`){timestamp, count} FROM  entities(k8s:pod) [attributes(k8s.pod.name) in [  ${Pod:singlequote} ] ] SINCE $__from UNTIL $__to",
+              "queryTypeSelected": "querybox",
+              "refId": "A"
+            }
+          ],
+          "title": "$Pod",
+          "transformations": [
+            {
+              "id": "calculateField",
+              "options": {
+                "alias": "Mean CPU Utilization",
+                "mode": "reduceRow",
+                "reduce": {
+                  "include": [
+                    "CPU Utilization : "
+                  ],
+                  "reducer": "mean"
+                },
+                "replaceFields": true
+              }
+            }
+          ],
+          "type": "gauge"
+        },
+        {
+          "datasource": {
+            "type": "appdynamicscloud",
+            "uid": "demo4"
+          },
+          "description": "Average Memory usage for the selected pods over the selected time period.",
+          "fieldConfig": {
+            "defaults": {
+              "displayName": "Memory Usage (Mean)",
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "purple",
+                    "value": null
+                  }
+                ]
+              },
+              "unit": "bytes"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 6,
+            "w": 5,
+            "x": 4,
+            "y": 1
+          },
+          "id": 23,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "area",
+            "justifyMode": "center",
+            "orientation": "vertical",
+            "reduceOptions": {
+              "calcs": [
+                "mean"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "text": {
+              "titleSize": 18,
+              "valueSize": 36
+            },
+            "textMode": "auto"
+          },
+          "pluginVersion": "9.1.3",
+          "targets": [
+            {
+              "constant": 6.5,
+              "datasource": {
+                "type": "appdynamicscloud",
+                "uid": "demo4"
+              },
+              "queryText": "FETCH\nattributes(k8s.pod.name),\n`Memory Usage : ` :  s.metrics(`k8s:memory.usage`, `sys:derived`){timestamp, value} * s.metrics(`k8s:memory.usage`, `sys:derived`){timestamp, group_count} / (s.metrics(`k8s:memory.usage`, `sys:derived`){timestamp, count} )\nFROM   s: entities(k8s:pod) [attributes(k8s.pod.name) in [  ${Pod:singlequote} ]]\nSINCE $__from UNTIL $__to",
+              "queryTypeSelected": "querybox",
+              "refId": "A"
+            }
+          ],
+          "title": "$Pod",
+          "transformations": [
+            {
+              "id": "calculateField",
+              "options": {
+                "alias": "Mean Memory Utilization",
+                "mode": "reduceRow",
+                "reduce": {
+                  "reducer": "mean"
+                },
+                "replaceFields": true
+              }
+            }
+          ],
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "type": "appdynamicscloud",
+            "uid": "demo4"
+          },
+          "description": "Number of pods by status over the selected time period.",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "fillOpacity": 80,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineWidth": 1,
+                "scaleDistribution": {
+                  "type": "linear"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "text",
+                    "value": null
+                  }
+                ]
+              }
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Failed"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "red",
+                      "mode": "fixed"
+                    }
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Succeeded"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "semi-dark-green",
+                      "mode": "fixed"
+                    }
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Unknown"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "purple",
+                      "mode": "fixed"
+                    }
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Running"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "dark-blue",
+                      "mode": "fixed"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 10,
+            "w": 15,
+            "x": 9,
+            "y": 1
+          },
+          "id": 26,
+          "options": {
+            "barRadius": 0,
+            "barWidth": 0.5,
+            "groupWidth": 0.7,
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "orientation": "auto",
+            "showValue": "auto",
+            "stacking": "normal",
+            "tooltip": {
+              "mode": "multi",
+              "sort": "none"
+            },
+            "xTickLabelMaxLength": 8,
+            "xTickLabelRotation": 0,
+            "xTickLabelSpacing": 100
+          },
+          "targets": [
+            {
+              "constant": 6.5,
+              "datasource": {
+                "type": "appdynamicscloud",
+                "uid": "demo4"
+              },
+              "queryText": "FETCH              Running: s.metrics(`k8s:pods.running`, `sys:derived`){timestamp, value},              \nPending: s.metrics(`k8s:pods.pending`, `sys:derived`){timestamp, value},            \nFailed:   s.metrics(`k8s:pods.failed`, `sys:derived`){timestamp, value},       \nSucceeded:       s.metrics(`k8s:pods.succeeded`, `sys:derived`){timestamp, value},        \nUnknown:      s.metrics(`k8s:pods.unknown`, `sys:derived`){timestamp, value}        \n  FROM              s: entities(k8s:cluster) [attributes(`k8s.cluster.name`) ='$Cluster' ]     \nSINCE $__from UNTIL $__to",
+              "queryTypeSelected": "querybox",
+              "refId": "A"
+            }
+          ],
+          "title": "Pod Count by Status : $Cluster",
+          "type": "barchart"
+        },
+        {
+          "datasource": {
+            "type": "appdynamicscloud",
+            "uid": "demo4"
+          },
+          "description": "Navigate to AppDynamics Cloud UI.",
+          "gridPos": {
+            "h": 4,
+            "w": 9,
+            "x": 0,
+            "y": 7
+          },
+          "id": 19,
+          "options": {
+            "code": {
+              "language": "plaintext",
+              "showLineNumbers": false,
+              "showMiniMap": false
+            },
+            "content": "<br/>\n<a href=\"${Source}/ui/observe/k8s/pod?filter=attributes(status) in [0,1, null,2,3]%26%26%20attributes(k8s.cluster.name)%3D${Cluster:singlequote}&since=${__from}&until=${__to}\" target=\"_blank\">\n  <div style=\"display:flex;justify-content:center;align-items:center\">\n    <img src=\"./public/plugins/appdynamicscloud/img/logo.svg\" width='48' height='48' alt=\"AppDynamicsLogo\" />\n    <h3 style=\"font-size:26px;padding-left:10px;font-weight:bold;margin-bottom: 0;\">Click here to view more <br/> on \n    AppDynamics Cloud<h3>\n  </div>\n</a>",
+            "mode": "html"
+          },
+          "pluginVersion": "9.1.3",
+          "type": "text"
+        },
+        {
+          "collapsed": false,
+          "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 11
+          },
+          "id": 28,
+          "panels": [],
+          "title": "Namespace Summary",
+          "type": "row"
+        },
+        {
+          "datasource": {
+            "type": "appdynamicscloud",
+            "uid": "P3A5C1F2B33C2418A"
+          },
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "continuous-GrYlRd"
+              },
+              "custom": {
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 20,
+                "gradientMode": "scheme",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineInterpolation": "smooth",
+                "lineWidth": 3,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  }
+                ]
+              }
+            },
+            "overrides": [
+              {
+                "__systemRef": "hideSeriesFrom",
+                "matcher": {
+                  "id": "byNames",
+                  "options": {
+                    "mode": "exclude",
+                    "names": [
+                      "Namespace Quota Usage Vs Limit : ad-ecommerce-warehouse"
+                    ],
+                    "prefix": "All except:",
+                    "readOnly": true
+                  }
+                },
+                "properties": [
+                  {
+                    "id": "custom.hideFrom",
+                    "value": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": true
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 9,
+            "w": 8,
+            "x": 0,
+            "y": 12
+          },
+          "id": 31,
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "targets": [
+            {
+              "constant": 6.5,
+              "datasource": {
+                "type": "appdynamicscloud",
+                "uid": "P3A5C1F2B33C2418A"
+              },
+              "queryText": "FETCH\nattributes(k8s.namespace.name),\n`Namespace Quota Usage Vs Limit :` : metrics(`k8s:resource_quota.memory.limits.usage`, `sys:derived`){timestamp, value} / metrics(`k8s:resource_quota.memory.limits`, `sys:derived`){timestamp, value} *100\nFROM   entities(k8s:namespace) [attributes(k8s.namespace.name) in [${Namespace:singlequote}]]\nSINCE $__from UNTIL $__to\nLIMITS metrics.round(3)",
+              "queryTypeSelected": "querybox",
+              "refId": "A"
+            }
+          ],
+          "title": "Namespace Quota Mem Usage Vs Limit (%):  $Namespace",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "appdynamicscloud",
+            "uid": "P3A5C1F2B33C2418A"
+          },
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "continuous-GrYlRd"
+              },
+              "custom": {
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 20,
+                "gradientMode": "scheme",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineInterpolation": "smooth",
+                "lineWidth": 3,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 9,
+            "w": 8,
+            "x": 8,
+            "y": 12
+          },
+          "id": 33,
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "targets": [
+            {
+              "constant": 6.5,
+              "datasource": {
+                "type": "appdynamicscloud",
+                "uid": "P3A5C1F2B33C2418A"
+              },
+              "queryText": "FETCH\nattributes(k8s.namespace.name),\n`Namespace Quota Usage :` : metrics(`k8s:resource_quota.memory.limits.usage`, `sys:derived`){timestamp, value},\n`Namespace Quota Limit :` : metrics(`k8s:resource_quota.memory.limits`, `sys:derived`){timestamp, value}\nFROM   entities(k8s:namespace) [attributes(k8s.namespace.name) in [${Namespace:singlequote}]]\nSINCE $__from UNTIL $__to\nLIMITS metrics.round(3)",
+              "queryTypeSelected": "querybox",
+              "refId": "A"
+            }
+          ],
+          "title": "Namespace Quota Mem Usage Vs Limit (%):  $Namespace",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "appdynamicscloud",
+            "uid": "P3A5C1F2B33C2418A"
+          },
+          "description": "Number of pods by status over the selected time period.",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "fillOpacity": 80,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineWidth": 1,
+                "scaleDistribution": {
+                  "type": "linear"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "text",
+                    "value": null
+                  }
+                ]
+              }
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Failed"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "red",
+                      "mode": "fixed"
+                    }
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Succeeded"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "semi-dark-green",
+                      "mode": "fixed"
+                    }
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Unknown"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "purple",
+                      "mode": "fixed"
+                    }
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Running"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "dark-blue",
+                      "mode": "fixed"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 9,
+            "w": 8,
+            "x": 16,
+            "y": 12
+          },
+          "id": 32,
+          "options": {
+            "barRadius": 0,
+            "barWidth": 0.5,
+            "groupWidth": 0.7,
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "orientation": "auto",
+            "showValue": "auto",
+            "stacking": "normal",
+            "tooltip": {
+              "mode": "multi",
+              "sort": "none"
+            },
+            "xTickLabelMaxLength": 8,
+            "xTickLabelRotation": 0,
+            "xTickLabelSpacing": 100
+          },
+          "targets": [
+            {
+              "constant": 6.5,
+              "datasource": {
+                "type": "appdynamicscloud",
+                "uid": "P3A5C1F2B33C2418A"
+              },
+              "queryText": "FETCH              Running: s.metrics(`k8s:pods.running`, `sys:derived`){timestamp, value},              \nPending: s.metrics(`k8s:pods.pending`, `sys:derived`){timestamp, value},            \nFailed:   s.metrics(`k8s:pods.failed`, `sys:derived`){timestamp, value},       \nSucceeded:       s.metrics(`k8s:pods.succeeded`, `sys:derived`){timestamp, value},        \nUnknown:      s.metrics(`k8s:pods.unknown`, `sys:derived`){timestamp, value}        \n  FROM              s: entities(k8s:namespace) [attributes(k8s.namespace.name) in [${Namespace:singlequote}]]\nSINCE $__from UNTIL $__to",
+              "queryTypeSelected": "querybox",
+              "refId": "A"
+            }
+          ],
+          "title": "Pod Count by Status : $Namespace",
+          "type": "barchart"
+        },
+        {
+          "collapsed": false,
+          "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 21
+          },
+          "id": 4,
+          "panels": [],
+          "title": "Pods Summary",
+          "type": "row"
+        },
+        {
+          "datasource": {
+            "type": "appdynamicscloud",
+            "uid": "demo4"
+          },
+          "description": "CPU usage trend for the selected pods over the selected time period.",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "text",
+                    "value": null
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 7,
+            "w": 11,
+            "x": 0,
+            "y": 22
+          },
+          "id": 5,
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "targets": [
+            {
+              "constant": 6.5,
+              "datasource": {
+                "type": "appdynamicscloud",
+                "uid": "demo4"
+              },
+              "queryText": "FETCH  attributes(k8s.pod.name),   `CPU Utilization : ` : metrics(`k8s:cpu.usage`, `sys:derived`){timestamp, value} * metrics(`k8s:cpu.usage`, `sys:derived`){timestamp, group_count} / metrics(`k8s:cpu.usage`, `sys:derived`){timestamp, count} FROM  entities(k8s:pod) [attributes(k8s.pod.name) in [  ${Pod:singlequote} ]] SINCE $__from UNTIL $__to",
+              "queryTypeSelected": "querybox",
+              "refId": "A"
+            }
+          ],
+          "title": "Pod CPU Usage: $Pod",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "appdynamicscloud",
+            "uid": "demo4"
+          },
+          "description": "CPU usage for the selected Containers over the selected time period.",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 25,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "normal"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 7,
+            "w": 12,
+            "x": 11,
+            "y": 22
+          },
+          "id": 10,
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "9.0.5",
+          "targets": [
+            {
+              "constant": 6.5,
+              "datasource": {
+                "type": "appdynamicscloud",
+                "uid": "demo4"
+              },
+              "queryText": "FETCH\n attributes(container.name),\n `CPU Used Utilization : ` : a1.metrics(`infra:container.cpu.used.utilization`, `infra-agent`){timestamp, value} \nFROM a1: entities(infra:container)[attributes(container.name) IN [${Container:singlequote}] && attributes(k8s.pod.name) IN [${Pod:singlequote}] ] \nSINCE $__from UNTIL $__to \nLIMITS metrics.round(3)",
+              "queryTypeSelected": "querybox",
+              "refId": "A"
+            }
+          ],
+          "title": "Container CPU Utilization (%): $Container",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "appdynamicscloud",
+            "uid": "demo4"
+          },
+          "description": "Memory usage for the selected pods over the selected time period.",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "fixedColor": "purple",
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "text",
+                    "value": null
+                  }
+                ]
+              },
+              "unit": "bytes"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 11,
+            "x": 0,
+            "y": 29
+          },
+          "id": 2,
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "9.1.2",
+          "targets": [
+            {
+              "constant": 6.5,
+              "datasource": {
+                "type": "appdynamicscloud",
+                "uid": "demo4"
+              },
+              "queryText": "FETCH\nattributes(k8s.pod.name),\n`Memory Usage : ` :  s.metrics(`k8s:memory.usage`, `sys:derived`){timestamp, value} * s.metrics(`k8s:memory.usage`, `sys:derived`){timestamp, group_count} / (s.metrics(`k8s:memory.usage`, `sys:derived`){timestamp, count} )\nFROM   s: entities(k8s:pod) [attributes(k8s.pod.name) in [  ${Pod:singlequote} ]]\nSINCE $__from UNTIL $__to",
+              "queryTypeSelected": "querybox",
+              "refId": "A"
+            }
+          ],
+          "title": "Pod Memory Usage: $Pod",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "appdynamicscloud",
+            "uid": "demo4"
+          },
+          "description": "CPU Throttled Time in seconds for the selected Containers over the selected time period.",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 25,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "normal"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 11,
+            "y": 29
+          },
+          "id": 11,
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "targets": [
+            {
+              "constant": 6.5,
+              "datasource": {
+                "type": "appdynamicscloud",
+                "uid": "demo4"
+              },
+              "queryText": "FETCH\n attributes(container.name),\n `CPU Throttled Time : ` : a1.metrics(`infra:container.cpu.throttled_time`, `infra-agent`){timestamp, value}\nFROM a1: entities(infra:container)[attributes(container.name) IN [${Container:singlequote}] && attributes(k8s.pod.name) IN [${Pod:singlequote}] ] \nSINCE $__from UNTIL $__to ",
+              "queryTypeSelected": "querybox",
+              "refId": "A"
+            }
+          ],
+          "title": "Container CPU Throttled Time (seconds): $Container",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "appdynamicscloud",
+            "uid": "demo4"
+          },
+          "description": "File system read/wirte I/O (per second) for the selected Containers over the selected time period.",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 25,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "normal"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": [
+              {
+                "__systemRef": "hideSeriesFrom",
+                "matcher": {
+                  "id": "byNames",
+                  "options": {
+                    "mode": "exclude",
+                    "names": [
+                      "Filesystem Read :  ecom-warehouse"
+                    ],
+                    "prefix": "All except:",
+                    "readOnly": true
+                  }
+                },
+                "properties": [
+                  {
+                    "id": "custom.hideFrom",
+                    "value": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": true
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 7,
+            "w": 24,
+            "x": 0,
+            "y": 37
+          },
+          "id": 12,
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "9.0.5",
+          "targets": [
+            {
+              "constant": 6.5,
+              "datasource": {
+                "type": "appdynamicscloud",
+                "uid": "demo4"
+              },
+              "queryText": "FETCH\n attributes(container.name),\n `Filesystem Read : ` : a1.metrics(\"infra:container.filesystem.read.io_sec\", \"infra-agent\"){timestamp, value} / 1024,\n `Filesystem Write : ` : a1.metrics(\"infra:container.filesystem.write.io_sec\", \"infra-agent\"){timestamp, value} / 1024\nFROM a1: entities(infra:container)[attributes(container.name) IN [${Container:singlequote}] && attributes(k8s.pod.name) IN [${Pod:singlequote}] ] \nSINCE $__from UNTIL $__to ",
+              "queryTypeSelected": "querybox",
+              "refId": "A"
+            }
+          ],
+          "title": "Container File System read-write IO/second: $Container",
+          "type": "timeseries"
+        },
+        {
+          "collapsed": false,
+          "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 44
+          },
+          "id": 8,
+          "panels": [],
+          "title": "Containers Summary",
+          "type": "row"
+        }
+      ],
+      "refresh": false,
+      "schemaVersion": 37,
+      "style": "dark",
+      "tags": [],
+      "templating": {
+        "list": [
+          {
+            "current": {
+              "selected": true,
+              "text": "demo-west-appdcloud-demo4",
+              "value": "demo-west-appdcloud-demo4"
+            },
+            "datasource": {
+              "type": "appdynamicscloud",
+              "uid": "demo4"
+            },
+            "definition": "FETCH attributes(k8s.cluster.name) from entities(k8s:cluster)",
+            "hide": 0,
+            "includeAll": false,
+            "label": "Cluster",
+            "multi": false,
+            "name": "Cluster",
+            "options": [],
+            "query": {
+              "rawQuery": "FETCH attributes(k8s.cluster.name) from entities(k8s:cluster)"
+            },
+            "refresh": 1,
+            "regex": "",
+            "skipUrlSync": false,
+            "sort": 0,
+            "type": "query"
+          },
+          {
+            "current": {
+              "selected": true,
+              "text": [
+                "ecom-warehouse-backoffice-7479684c47-n7t5d"
+              ],
+              "value": [
+                "ecom-warehouse-backoffice-7479684c47-n7t5d"
+              ]
+            },
+            "datasource": {
+              "type": "appdynamicscloud",
+              "uid": "demo4"
+            },
+            "definition": "FETCH attributes(k8s.pod.name) from entities (k8s:cluster)   [ attributes(k8s.cluster.name) = '$Cluster' ] .out.to(k8s:namespace)  .out.to(k8s:service)  [ attributes(k8s.namespace.name) in [${Namespace:singlequote}]] .out.to(k8s:pod)",
+            "hide": 0,
+            "includeAll": false,
+            "label": "Pods",
+            "multi": true,
+            "name": "Pod",
+            "options": [],
+            "query": {
+              "rawQuery": "FETCH attributes(k8s.pod.name) from entities (k8s:cluster)   [ attributes(k8s.cluster.name) = '$Cluster' ] .out.to(k8s:namespace)  .out.to(k8s:service)  [ attributes(k8s.namespace.name) in [${Namespace:singlequote}]] .out.to(k8s:pod)"
+            },
+            "refresh": 1,
+            "regex": "",
+            "skipUrlSync": false,
+            "sort": 0,
+            "type": "query"
+          },
+          {
+            "current": {
+              "selected": true,
+              "text": [
+                "ecom-warehouse"
+              ],
+              "value": [
+                "ecom-warehouse"
+              ]
+            },
+            "datasource": {
+              "type": "appdynamicscloud",
+              "uid": "demo4"
+            },
+            "definition": "FETCH attributes(container.name) from entities(k8s:cluster) [ attributes(k8s.cluster.name) = '$Cluster']  .out.to(k8s:namespace)  .out.to(k8s:service) [ attributes(k8s.namespace.name) in [${Namespace:singlequote}] ]  .out.to(k8s:pod)  [attributes(k8s.pod.name) in [ ${Pod:singlequote} ] ] .out.to(infra:container)",
+            "hide": 0,
+            "includeAll": false,
+            "label": "Container",
+            "multi": true,
+            "name": "Container",
+            "options": [],
+            "query": {
+              "rawQuery": "FETCH attributes(container.name) from entities(k8s:cluster) [ attributes(k8s.cluster.name) = '$Cluster']  .out.to(k8s:namespace)  .out.to(k8s:service) [ attributes(k8s.namespace.name) in [${Namespace:singlequote}] ]  .out.to(k8s:pod)  [attributes(k8s.pod.name) in [ ${Pod:singlequote} ] ] .out.to(infra:container)"
+            },
+            "refresh": 1,
+            "regex": "",
+            "skipUrlSync": false,
+            "sort": 0,
+            "type": "query"
+          },
+          {
+            "current": {
+              "selected": false,
+              "text": "https://demo4.observe.appdynamics.com",
+              "value": "https://demo4.observe.appdynamics.com"
+            },
+            "datasource": {
+              "type": "appdynamicscloud",
+              "uid": "demo4"
+            },
+            "definition": "configURL",
+            "hide": 2,
+            "includeAll": false,
+            "multi": false,
+            "name": "Source",
+            "options": [],
+            "query": {
+              "rawQuery": "configURL"
+            },
+            "refresh": 1,
+            "regex": "",
+            "skipUrlSync": false,
+            "sort": 0,
+            "type": "query"
+          },
+          {
+            "current": {
+              "selected": true,
+              "text": [
+                "ad-ecommerce-warehouse"
+              ],
+              "value": [
+                "ad-ecommerce-warehouse"
+              ]
+            },
+            "datasource": {
+              "type": "appdynamicscloud",
+              "uid": "demo4"
+            },
+            "definition": "FETCH attributes(k8s.namespace.name) from entities (k8s:cluster) [attributes(k8s.cluster.name) = '$Cluster'].out.to(k8s:namespace) ",
+            "hide": 0,
+            "includeAll": false,
+            "multi": true,
+            "name": "Namespace",
+            "options": [],
+            "query": {
+              "rawQuery": "FETCH attributes(k8s.namespace.name) from entities (k8s:cluster) [attributes(k8s.cluster.name) = '$Cluster'].out.to(k8s:namespace) "
+            },
+            "refresh": 1,
+            "regex": "",
+            "skipUrlSync": false,
+            "sort": 0,
+            "type": "query"
+          }
+        ]
+      },
+      "time": {
+        "from": "now-1h",
+        "to": "now"
+      },
+      "timepicker": {},
+      "timezone": "browser",
+      "title": "AppDynamics K8s Namespace Monitoring : demo4",
+      "uid": "wsQ5t4o4z",
+      "version": 3,
+      "weekStart": ""
+    }
