@@ -11,6 +11,8 @@ You can spin-up a kubernetes pod running grafana and our grafana plugin
 ```./build.sh```
 * Push the new image to your repo
 * Move to the __/helm/grafana/__ folder
+* Rename __values_sample.yaml__ to __values.yaml__
+* Edit __values_sample.yaml__ adding the information from your tenant
 * ```helm install grafana .```
 
 
