@@ -1,6 +1,12 @@
 # Grafana Plugin
 You can spin-up a kubernetes pod running grafana and our grafana plugin
 
+### Reqs
+* CNAO license
+* helm
+* kubernetes
+* docker
+
 ### Running
 
 * Move to the __image__ folder
