@@ -1,0 +1,11 @@
+{
+  "name": "nodejs-apig",
+  "version": "1.0.0",
+  "private": true,
+  "devDependencies": {
+    "aws-sdk": "2.814.0"
+  },
+  "dependencies": {
+    "appdynamics-lambda-tracer": "^21.11.348"
+  }
+}
