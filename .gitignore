@@ -26,3 +26,6 @@ cnao-grafana-plugin/helm/grafana/values.yaml
 cnao-grafana-plugin/image/appdynamicscloud
 cnao-api-gtw-lambda/env_otel_sample.txt
 cnao-api-gtw-lambda/.DS_Store
+.DS_Store
+*.tfvars
+.DS_Store
