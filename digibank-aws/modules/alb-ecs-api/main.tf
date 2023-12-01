@@ -22,10 +22,9 @@ EOF
 }
 
 resource "aws_iam_role_policy_attachment" "test-attach" {
-  role       = "arn:aws:iam::${var.aws_account}:role/ecsTaskExecutionRole"
+  role       = "ecsTaskExecutionRole"
   policy_arn = "${aws_iam_policy.AppDynamicsInframonECSPolicy.arn}"
 }
-
 
 data "aws_availability_zones" "available_zones" {
   state = "available"
